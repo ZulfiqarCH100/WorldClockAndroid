@@ -61,11 +61,10 @@ public class ShowAll extends AppCompatActivity {
     }
 
     public void filter(String s){
-        temp.clear();
+        temp = new ArrayList<>();
         for(City c : allCities){
             if (c.getName().toLowerCase().contains(s.toLowerCase()))
                 temp.add(c);
-            Log.i("Lmao", c.getName());
         }
         mAdapter.changeList(temp);
         mAdapter.notifyDataSetChanged();
