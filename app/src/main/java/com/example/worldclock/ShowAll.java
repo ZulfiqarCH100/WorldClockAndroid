@@ -72,27 +72,27 @@ public class ShowAll extends AppCompatActivity {
 
     public void populateCities(ArrayList<City> t){
         //Input all cities and their respective TimeZones.
-        t.add(new City("Islamabad", "Africa/Timbuktu"));
-        t.add(new City("Karachi", "Atlantic/Canary"));
-        t.add(new City("Tokyo", "Europe/Tiraspol"));
+        t.add(new City("Dubai", "Asia/Dubai"));
+        t.add(new City("Hong Kong", "Asia/Hong_Kong"));
+        t.add(new City("Sydney", "Australia/Sydney"));
         t.add(new City("Beijing", "Australia/Lord_Howe"));
-        t.add(new City("Lahore", "Indian/Mahe"));
-        t.add(new City("Paris", "Asia/Baghdad"));
-        t.add(new City("Mumbai", "Africa/Johannesburg"));
-        t.add(new City("London", "Asia/Karachi"));
-        t.add(new City("Blep Bloop", "Asia/Thimbu"));
-        t.add(new City("Multan", "Asia/Krasnoyarsk"));
-        t.add(new City("Out of Cities", "Asia/Kashgar"));
-        t.add(new City("Argentina", "Singapore"));
-        t.add(new City("Sirf Tina", "Australia/Adelaide"));
-        t.add(new City("Non Urgent Tina", "Australia/NSW"));
-        t.add(new City("Spain", "Pacific/Truk"));
-        t.add(new City("Madrid", "Pacific/Tarawa"));
-        t.add(new City("Barcelona", "Pacific/Kiritimati"));
-        t.add(new City("Rainbow Road", "Asia/Seoul"));
-        t.add(new City("Mera Ghar", "Asia/Seoul"));
-        t.add(new City("Should Really use a file for this", "Asia/Seoul"));
-        t.add(new City("Dun", "Asia/Seoul"));
+        t.add(new City("Tokyo", "Asia/Tokyo"));
+        t.add(new City("Paris", "Europe/Paris"));
+        t.add(new City("Calcutta", "Asia/Calcutta"));
+        t.add(new City("London", "Europe/London"));
+        t.add(new City("Madrid", "Europe/Madrid"));
+        t.add(new City("Multan", "Asia/Karachi"));
+        t.add(new City("Kiev", "Europe/Kiev"));
+        t.add(new City("Rome", "Europe/Rome"));
+        t.add(new City("Cairo", "Africa/Cairo"));
+        t.add(new City("Chicago", "America/Chicago"));
+        t.add(new City("Montreal", "America/Montreal"));
+        t.add(new City("Dhaka", "Asia/Dhaka"));
+        t.add(new City("Tehran", "Asia/Tehran"));
+        t.add(new City("Athens", "Europe/Athens"));
+        t.add(new City("Moscow", "Europe/Moscow"));
+        t.add(new City("Dublin", "Europe/Dublin"));
+        t.add(new City("Baghdad", "Asia/Baghdad"));
     }
 
     @Override
