@@ -31,7 +31,7 @@ public class ShowAll extends AppCompatActivity {
         handleSearch();
     }
 
-    private void handleSearch(){
+    public void handleSearch(){
         EditText searchText = findViewById(R.id.search);
         searchText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -51,14 +51,13 @@ public class ShowAll extends AppCompatActivity {
         });
     }
 
-    private void handleIntent(){
+    public void handleIntent(){
         Intent intent = getIntent();
         allCities.clear();
         allCities = (ArrayList<City>) intent.getSerializableExtra("SelectMore");
         if(allCities.size() == 0)
             populateCities(allCities);
         temp = allCities;
-        Log.i("Lmao", "Yahan tak chala");
     }
 
     public void filter(String s){
@@ -66,6 +65,7 @@ public class ShowAll extends AppCompatActivity {
         for(City c : allCities){
             if (c.getName().toLowerCase().contains(s.toLowerCase()))
                 temp.add(c);
+            Log.i("Lmao", c.getName());
         }
         mAdapter.changeList(temp);
         mAdapter.notifyDataSetChanged();
