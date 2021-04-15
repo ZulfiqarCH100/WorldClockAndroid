@@ -24,10 +24,6 @@ public class City implements Serializable {
         return time;
     }
 
-    public void setTime(TimeZone time) {
-        this.time = time;
-    }
-
     public boolean isSubscribed() {
         return subscribed;
     }

@@ -18,23 +18,21 @@ public class ShowAll extends AppCompatActivity {
     private RecyclerView mRecyclerview;
     private ShowAllAdapter mAdapter; //Only sends as many objects to the RecyclerView as it can view in one screen.
     private RecyclerView.LayoutManager mLayoutManager;
-    ArrayList<City> temp;
+    private ArrayList<City> temp; //Modified for filtering.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         allCities = new ArrayList<>();
+        temp = new ArrayList<>();
         setContentView(R.layout.show_all);
-
-        Intent intent = getIntent();
-        allCities.clear();
-        allCities = (ArrayList<City>) intent.getSerializableExtra("SelectMore");
-        if(allCities.size() == 0)
-            populateCities(allCities);
-        temp = allCities;
+        handleIntent();
         buildRecyclerView();
+        handleSearch();
+    }
 
-        EditText searchText = findViewById(R.id.search);;
+    public void handleSearch(){
+        EditText searchText = findViewById(R.id.search);
         searchText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -53,6 +51,15 @@ public class ShowAll extends AppCompatActivity {
         });
     }
 
+    public void handleIntent(){
+        Intent intent = getIntent();
+        allCities.clear();
+        allCities = (ArrayList<City>) intent.getSerializableExtra("SelectMore");
+        if(allCities.size() == 0)
+            populateCities(allCities);
+        temp = allCities;
+    }
+
     public void filter(String s){
         temp = new ArrayList<>();
         for(City c : allCities){
@@ -64,7 +71,7 @@ public class ShowAll extends AppCompatActivity {
     }
 
     public void populateCities(ArrayList<City> t){
-        //Input all cities.
+        //Input all cities and their respective TimeZones.
         t.add(new City("Islamabad", "Africa/Timbuktu"));
         t.add(new City("Karachi", "Atlantic/Canary"));
         t.add(new City("Tokyo", "Europe/Tiraspol"));
@@ -102,7 +109,6 @@ public class ShowAll extends AppCompatActivity {
 
     public void buildRecyclerView() {
         mRecyclerview = findViewById(R.id.recyclerView2);
-        mRecyclerview.setHasFixedSize(true); //Increases performance as recycler view never changes in size.
         mLayoutManager = new LinearLayoutManager(this);
         mAdapter = new ShowAllAdapter(temp);
         mRecyclerview.setLayoutManager(mLayoutManager);
