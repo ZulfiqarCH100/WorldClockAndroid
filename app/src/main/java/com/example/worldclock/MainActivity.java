@@ -66,7 +66,5 @@ public class MainActivity extends AppCompatActivity {
         mAdapter = new MainAdapter(temp);
         mRecyclerview.setLayoutManager(mLayoutManager);
         mRecyclerview.setAdapter(mAdapter);
-
-        //Subscribing to the click listeners by implementing the interface.
     }
 }
