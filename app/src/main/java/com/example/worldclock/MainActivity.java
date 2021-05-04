@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -15,12 +16,13 @@ import android.widget.Button;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    private ArrayList<City> list;
     private ArrayList<City> temp;
     private RecyclerView mRecyclerview;
     private MainAdapter mAdapter; //Only sends as many objects to the RecyclerView as it can view in one screen.
     private RecyclerView.LayoutManager mLayoutManager;
     private Button addMore;
+    private Database db;
+
 
     final int REQUEST_CODE = 1;
 
@@ -29,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         addMore = findViewById(R.id.addMore); //Our button
-        list = new ArrayList<>();
         temp = new ArrayList<>();
 
         addMore.setOnClickListener(new View.OnClickListener() {
@@ -39,23 +40,58 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         buildRecyclerView();
+
+        //Setting up database
+        db = new SQLite(getApplicationContext());
+        if (db.isDbEmpty())
+            setUpDatabase();
+        showSavedCities();
+    }
+
+    private void showSavedCities(){
+        temp.clear();
+        temp = db.load(true);
+        mAdapter.changeList(temp);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    //Will only run when the application is run for the very first time.
+    public void setUpDatabase(){
+        ArrayList<City> t = new ArrayList<>();
+        t.add(new City("Dubai", "Asia/Dubai"));
+        t.add(new City("Hong Kong", "Asia/Hong_Kong"));
+        t.add(new City("Sydney", "Australia/Sydney"));
+        t.add(new City("Beijing", "Australia/Lord_Howe"));
+        t.add(new City("Tokyo", "Asia/Tokyo"));
+        t.add(new City("Paris", "Europe/Paris"));
+        t.add(new City("Calcutta", "Asia/Calcutta"));
+        t.add(new City("London", "Europe/London"));
+        t.add(new City("Madrid", "Europe/Madrid"));
+        t.add(new City("Multan", "Asia/Karachi"));
+        t.add(new City("Kiev", "Europe/Kiev"));
+        t.add(new City("Rome", "Europe/Rome"));
+        t.add(new City("Cairo", "Africa/Cairo"));
+        t.add(new City("Chicago", "America/Chicago"));
+        t.add(new City("Montreal", "America/Montreal"));
+        t.add(new City("Dhaka", "Asia/Dhaka"));
+        t.add(new City("Tehran", "Asia/Tehran"));
+        t.add(new City("Athens", "Europe/Athens"));
+        t.add(new City("Moscow", "Europe/Moscow"));
+        t.add(new City("Dublin", "Europe/Dublin"));
+        t.add(new City("Baghdad", "Asia/Baghdad"));
+
+        db.fillDb(t);
+        Log.d("Boop", "Database set up");
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        list = (ArrayList<City>) data.getSerializableExtra("Subscribed");
-        temp.clear();
-        for (int x = 0; x < list.size(); x++){
-            if (list.get(x).isSubscribed())
-                temp.add(list.get(x));
-        }
-        mAdapter.notifyDataSetChanged();
+        showSavedCities();
     }
 
     void showAllCities(){
         Intent intent = new Intent(this, ShowAll.class);
-        intent.putExtra("SelectMore", list);
         startActivityForResult(intent, REQUEST_CODE);
     }
 

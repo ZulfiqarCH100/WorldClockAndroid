@@ -71,4 +71,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ExampleViewHol
     public int getItemCount() {
         return list.size();
     }
+    public void changeList(ArrayList<City> l){
+        list = l;
+    }
 }
