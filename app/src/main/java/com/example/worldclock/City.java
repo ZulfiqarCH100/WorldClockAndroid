@@ -1,17 +1,18 @@
 package com.example.worldclock;
 
+import android.util.Log;
 import java.io.Serializable;
-import java.sql.Time;
-import java.util.Date;
+import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.TimeZone;
 
 public class City implements Serializable {
     String name;
     TimeZone time;
-    String timezone;
+    String timezone, currentTime;
     boolean subscribed;
 
-    public City(String n, String t) {name = n; time = TimeZone.getTimeZone(t); subscribed = false; timezone = t;}
+    public City(String n, String t) {name = n; time = TimeZone.getTimeZone(t); subscribed = false; timezone = t; currentTime = new String(); }
 
     public String getName() {
         return name;
@@ -37,5 +38,20 @@ public class City implements Serializable {
         if (subscribed == true)
             return 1;
         return 0;
+    }
+
+    public void updateTime(DateFormat dateFormat){
+        Calendar cal = Calendar.getInstance(this.time);
+        dateFormat.setTimeZone(cal.getTimeZone());
+        currentTime = (dateFormat.format(cal.getTime()));
+        Log.d("Boop", "Thread Running");
+    }
+
+    public void test(){
+        Log.d("Wow", "I am a city with name" + name);
+    }
+
+    public String getCurrentTime(){
+        return currentTime;
     }
 }

@@ -4,16 +4,21 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+
 
 public class MainActivity extends AppCompatActivity {
     private ArrayList<City> temp;
@@ -22,7 +27,8 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager mLayoutManager;
     private Button addMore;
     private Database db;
-
+    private Handler mainHandler = new Handler(); //Since the handler is initalized in the main thread it puts work in the message queue of the main thread.
+    private volatile boolean stopThread = false; //Used to stop a running thread. Volatile means a thread only reads the most up to date version of this variable.
 
     final int REQUEST_CODE = 1;
 
@@ -46,9 +52,17 @@ public class MainActivity extends AppCompatActivity {
         if (db.isDbEmpty())
             setUpDatabase();
         showSavedCities();
+
+        startThread();
     }
 
-    private void showSavedCities(){
+    private void startThread(){
+        stopThread = false;
+        Runnable timeUpdater = new TimeUpdater(1000);
+        new Thread(timeUpdater).start();
+    }
+
+    private void showSavedCities() {
         temp.clear();
         temp = db.load(true);
         mAdapter.changeList(temp);
@@ -56,44 +70,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //Will only run when the application is run for the very first time.
-    public void setUpDatabase(){
-        ArrayList<City> t = new ArrayList<>();
-        t.add(new City("Dubai", "Asia/Dubai"));
-        t.add(new City("Hong Kong", "Asia/Hong_Kong"));
-        t.add(new City("Sydney", "Australia/Sydney"));
-        t.add(new City("Beijing", "Australia/Lord_Howe"));
-        t.add(new City("Tokyo", "Asia/Tokyo"));
-        t.add(new City("Paris", "Europe/Paris"));
-        t.add(new City("Calcutta", "Asia/Calcutta"));
-        t.add(new City("London", "Europe/London"));
-        t.add(new City("Madrid", "Europe/Madrid"));
-        t.add(new City("Multan", "Asia/Karachi"));
-        t.add(new City("Kiev", "Europe/Kiev"));
-        t.add(new City("Rome", "Europe/Rome"));
-        t.add(new City("Cairo", "Africa/Cairo"));
-        t.add(new City("Chicago", "America/Chicago"));
-        t.add(new City("Montreal", "America/Montreal"));
-        t.add(new City("Dhaka", "Asia/Dhaka"));
-        t.add(new City("Tehran", "Asia/Tehran"));
-        t.add(new City("Athens", "Europe/Athens"));
-        t.add(new City("Moscow", "Europe/Moscow"));
-        t.add(new City("Dublin", "Europe/Dublin"));
-        t.add(new City("Baghdad", "Asia/Baghdad"));
-
-        db.fillDb(t);
-        Log.d("Boop", "Database set up");
+    public void setUpDatabase() {
+        //Connecting to API
+        Toast.makeText(getApplicationContext(), "Contacting Api and Building Database", Toast.LENGTH_LONG).show();
+        Runnable json = new ApiThread();
+        new Thread(json).start();
+        Toast.makeText(getApplicationContext(), "All Done :)", Toast.LENGTH_SHORT).show();
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         showSavedCities();
+        startThread();
     }
 
-    void showAllCities(){
+    void showAllCities() {
         Intent intent = new Intent(this, ShowAll.class);
         startActivityForResult(intent, REQUEST_CODE);
+        stopThread = true;
     }
+
 
     public void buildRecyclerView() {
         mRecyclerview = findViewById(R.id.recyclerView);
@@ -102,5 +100,76 @@ public class MainActivity extends AppCompatActivity {
         mAdapter = new MainAdapter(temp);
         mRecyclerview.setLayoutManager(mLayoutManager);
         mRecyclerview.setAdapter(mAdapter);
+    }
+
+
+    //Implementing my thread class.
+    class TimeUpdater implements Runnable {
+        int sleepTime;
+
+        TimeUpdater(int sleepTime) {
+            this.sleepTime = sleepTime;
+        }
+
+        @Override
+        public void run() {
+            DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+            while (stopThread == false){
+                if (temp.size() != 0){
+                    for(int x = 0; x < temp.size(); x++)
+                        temp.get(x).updateTime(dateFormat);
+                }
+
+                mainHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAdapter.notifyDataSetChanged();
+                    }
+                });
+
+                try {
+                    Thread.sleep(sleepTime);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    class ApiThread implements Runnable{
+        ArrayList<City> cities;
+
+        ApiThread(){cities = new ArrayList<>();}
+
+        @Override
+        public void run() {
+            HttpHandler sh = new HttpHandler();
+            // Making a request to url and getting response
+            String url = "https://api.timezonedb.com/v2.1/list-time-zone?key=AAAKZ8GJTJH5&format=json&fields=zoneName";
+            String jsonStr = sh.makeServiceCall(url);
+
+            if (jsonStr != null) {
+                try {
+                    JSONObject jsonObj = new JSONObject(jsonStr);
+                    // Getting JSON Array node
+                    JSONArray zones = jsonObj.getJSONArray("zones");
+
+                    // looping through All Contacts.
+                    for (int i = 0; i < zones.length(); i++) {
+                        JSONObject c = zones.getJSONObject(i);
+                        String zoneName = c.getString("zoneName");
+                        String cityName = zoneName.substring(zoneName.indexOf('/') + 1);
+                        if (cityName.indexOf('/') == -1) {
+                            if (cityName.indexOf('_') != -1)
+                                cityName = cityName.replace('_', ' ');
+                            cities.add(new City(cityName, zoneName));
+                        }
+                    }
+                    db.fillDb(cities);
+                } catch (final JSONException e) {
+                    Log.e("dont care", "Json parsing error: " + e.getMessage());
+                }
+            }
+        }
     }
 }

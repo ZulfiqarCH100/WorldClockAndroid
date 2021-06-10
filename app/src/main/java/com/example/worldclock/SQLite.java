@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -74,6 +75,7 @@ public class SQLite implements Database {
 
     @Override
     public void fillDb(ArrayList<City> cities) {
+        Log.d("Wow", "Database Call Made");
         SQLiteHelper helper = new SQLiteHelper(context);
         SQLiteDatabase db = helper.getWritableDatabase();
 

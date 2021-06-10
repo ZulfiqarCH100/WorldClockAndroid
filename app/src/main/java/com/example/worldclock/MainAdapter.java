@@ -1,16 +1,9 @@
 package com.example.worldclock;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,7 +14,6 @@ import java.util.Calendar;
 
 public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ExampleViewHolder> {
     private ArrayList<City> list;
-    private DateFormat dateFormat;
     private onItemClickListener mListener;
 
     //This interface would be implemented in main activity to get position of the item clicked.
@@ -35,7 +27,6 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ExampleViewHol
 
     public MainAdapter(ArrayList<City> l) {
         this.list = l;
-        dateFormat = new SimpleDateFormat("HH:mm");
     }
 
     //We cant use a non static class inside a static class so we pass the ExampleViewHolder a onclick listener object.
@@ -44,8 +35,8 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ExampleViewHol
         public TextView time;
         public ExampleViewHolder(View itemView, onItemClickListener listener) {
             super(itemView);
-           cityName = itemView.findViewById(R.id.subCityName);
-           time = itemView.findViewById(R.id.subTime);
+            cityName = itemView.findViewById(R.id.subCityName);
+            time = itemView.findViewById(R.id.subTime);
         }
     }
 
@@ -62,9 +53,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.ExampleViewHol
     public void onBindViewHolder(@NonNull ExampleViewHolder holder, int position) {
         City current = list.get(position);
         holder.cityName.setText(current.getName());
-        Calendar cal = Calendar.getInstance(current.getTime());
-        dateFormat.setTimeZone(cal.getTimeZone());
-        holder.time.setText(dateFormat.format(cal.getTime()));
+        holder.time.setText(current.getCurrentTime());
     }
 
     @Override
